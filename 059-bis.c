@@ -81,10 +81,16 @@ void fill_content(char *filename, Array content) {
 int rec_crack(Array content, Array code, Array decoded, char *buffer) {
     int i;
     char tmp[4];
+    int sum=0;
+    char *str;
     if (code->length == code->max_length) {
         decode(content,code,decoded);
         if (potential_good_str(str_Array(decoded,buffer))) {
             fprintf(stderr,"Code: %s\nResult: %s\n",str_Array(code,tmp),buffer);
+            for (str=buffer; *str; str++) {
+                sum += *str;
+            }
+            fprintf(stderr, "Somme: %d\n",sum);
         }
     } else {
         if (code->length == 1) {
@@ -102,8 +108,9 @@ int rec_crack(Array content, Array code, Array decoded, char *buffer) {
 int crack(Array content) {
     Array decoded=new_Array(content->max_length);
     Array code=new_Array(3);
-    char tmp[4];
     char *buffer=(char *)malloc(2000);
+    /*
+    char tmp[4];
     char *str;
     int sum;
 
@@ -118,6 +125,7 @@ int crack(Array content) {
     }
     fprintf(stderr, "Somme: %d\n",sum);
     // ---
+    */
 
     rec_crack(content,code,decoded,buffer);
 }
