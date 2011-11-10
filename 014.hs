@@ -2,7 +2,10 @@ import Data.List
 type YInt = Int
 
 collatz :: YInt -> YInt
-collatz n = if n<0 then 1 else if even n then n `quot` 2 else 3*n+1
+collatz n 
+    | n<0       = 1  
+    | even n    = n `quot` 2 
+    | otherwise = 3*n+1
 
 -- The l `seq` is necessary to not be lazy (non-strict)
 -- And not to fill the stack
