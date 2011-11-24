@@ -3,7 +3,7 @@ module Prime
 , is_prime
 )
 where 
-    data Wheel = Wheel Integer [Integer]
+    data Wheel = Wheel Int [Int]
     roll (Wheel n rs) =  [n*k+r| k<-[0..], r<-rs]
     
     nextSize (Wheel n rs) p =
@@ -13,7 +13,7 @@ where
     
     mkWheel ds = foldl nextSize w0 ds
     
-    primes :: [Integer]
+    primes :: [Int]
     primes = small ++ large
         where
             1:p:candidates  = roll $ mkWheel small

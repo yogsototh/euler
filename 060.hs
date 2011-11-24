@@ -1,50 +1,70 @@
--- 
--- The primes 3, 7, 109, and 673, are quite remarkable. 
--- By taking any two primes and concatenating them in any order the result will always be prime. 
--- For example, taking 7 and 109, both 7109 and 1097 are prime. 
--- The sum of these four primes, 792, represents the lowest sum for a set of four primes with this property.
+-- Problem 60
+-- 02 January 2004
+--
+-- The primes 3, 7, 109, and 673, are quite remarkable. By taking any two primes and concatenating them in any order the result will always be prime. For example, taking 7 and 109, both 7109 and 1097 are prime. The sum of these four primes, 792, represents the lowest sum for a set of four primes with this property.
 --
 -- Find the lowest sum for a set of five primes for which any two primes concatenate to produce another prime.
 --
 
--- Should use the following property
--- [x,y,z,t] special <=> [x,y,z] & [x,y,t] & [x,z,t] & [y,z,t] special
-
-
-import Debug.Trace
-import Data.List
 import Prime
 
-is_couple_prime x y = ( is_prime $ read $ strx ++ stry ) &&  (is_prime $ read $ stry ++ strx)
-    where
-        strx = show x
-        stry = show y
+numOfDigits x
+    | x < 10 = 1
+    | x < 100 = 2
+    | x < 1000 = 3
+    | x < 10000 = 4
+    | x < 100000 = 5
+    | x < 1000000 = 6
+    | x < 10000000 = 7
+--    | otherwise = truncate (logBase 10 x)
 
-first_concat_prime_with_list x [] = True
-first_concat_prime_with_list x (y:ys) = is_couple_prime x y && first_concat_prime_with_list x ys
+-- equivalent but faster than "read (show x ++ show y)"
+concatNumbers :: Int -> Int -> Int
+concatNumbers x y = (10^numOfDigits y)*x + y
 
--- are_concat_primes [3,7,109,673] return true if number are primes
--- even with concat
-are_concat_primes [] = True
-are_concat_primes (x:xs) = (are_concat_primes xs) && first_concat_prime_with_list x xs
+areConcatPrime :: [Int] -> Bool
+areConcatPrime [] = True
+areConcatPrime (x:xs) =
+    -- (areConcatPrime xs) && (and $ map concatPrime_x xs)
+    all concatPrime_x xs
+    where 
+        concatPrime_x :: Int -> Bool
+        concatPrime_x y = all is_prime [concatNumbers x y, concatNumbers y x]
 
-special_numbers 1 = take 300 primes
--- special_numbers n = nub $ flatten $ filter (\x -> traceShow x are_concat_primes x) $ subsets n (special_numbers (n-1))
-special_numbers n = nub $ flatten $ filter are_concat_primes $ subsets n (special_numbers (n-1))
-    where
-        flatten [] = []
-        flatten ([]:ys) = flatten ys
-        flatten ((x:xs):ys) = x:flatten (xs:ys)
 
-subsets :: Integer -> [a] -> [[a]]
-subsets 0 _ = [[]]
-subsets n [] = []
-subsets n (x:xs) = [x:ys | ys <- subsets (n-1) xs ] ++ subsets n xs
+-- for 1 should return a list of one element list containing a unique prime
+--
+cprimes :: Int -> [[Int]]
+cprimes n = concatMap (memoizedConcatPrimes n) [(n-1)..]
+
+-- concatPrimes' :: Int -> Int -> [[Int]]
+-- concatPrimes' 0 _ = [[]]
+-- concatPrimes' _ (-1) = error "concatPrimes' ERROR"
+-- concatPrimes' _ 0 = []
+-- concatPrimes' 1 max = [[ primes !! fromInt max ]]
+-- concatPrimes' n max = filter areConcatPrime [ p:cprimes | cprimes <- subsets  ]
+--     where p = primes !! fromInt max
+--           -- subsets = memoized !! fromInt (n-1)
+--           subsets = concatMap (concatPrimes' (n-1)) [0..(max-1)]
+
+memoizedConcatPrimes n max =
+    let p =  primes !! max
+        subsets = concatMap (memoizedConcatPrimes (n-1)) [0..(max-1)]
+        concatPrimes 0 _ = [[]]
+        concatPrimes _ 0 = []
+        concatPrimes 1 max = [[ primes !! max ]]
+        concatPrimes n max = filter areConcatPrime [p:cprimes | cprimes <- subsets ]
+    in  map (map concatPrimes [0..] !! n) [0..] !! max
 
 main = do
-        putStrLn $ show $ are_concat_primes [3,7,109,673]
-        putStrLn $ show $ numbers
-        putStrLn $ show $ result
-        where
-            numbers = take 5 $ special_numbers 5
-            result  = sum numbers
+    print $ take 20 $ cprimes 2
+    print $ cprimes 3 !! 0
+    print $ cprimes 3 !! 1
+    print $ cprimes 3 !! 2
+    print $ take 20 $ cprimes 3
+    print $ cprimes 4 !! 0
+    print $ cprimes 4 !! 1
+    print $ cprimes 4 !! 2
+    let res = take 3 $ cprimes 5
+    print res
+    print (map sum res)
