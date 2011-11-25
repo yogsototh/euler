@@ -254,7 +254,7 @@ def tonumber(hand)
             when 'K'     then  13
             when 'A'     then  14
             end
-        end
+        end.sort
 end
 
 def highest_card(hand1,hand2)
@@ -278,9 +278,9 @@ def win(h)
     hand2=h[1]
 
     cat1=Category.new(hand1)
-    puts "HAND1: #{cat1.to_s}" 
+    # puts "HAND1: #{cat1.to_s}" 
     cat2=Category.new(hand2)
-    puts "HAND2: #{cat2.to_s}" 
+    # puts "HAND2: #{cat2.to_s}" 
 
     # Best category win
     if cat1.cat > cat2.cat
@@ -312,10 +312,12 @@ end
 sum=0
 hands.each do |h|
     if win(h)
-        puts "PLAYER 1 (WIN)"
+        # puts "PLAYER 1 (WIN)"
+        puts "True"
         sum+=1
     else
-        puts "PLAYER 2 (LOSE)"
+        puts "False"
+        # puts "PLAYER 2 (LOSE)"
     end
 end
 
