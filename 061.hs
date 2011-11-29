@@ -15,55 +15,53 @@
 -- This is the only set of 4-digit numbers with this property.
 -- Find the sum of the only ordered set of six cyclic 4-digit numbers for which each polygonal type: triangle, square, pentagonal, hexagonal, heptagonal, and octagonal, is represented by a different number in the set.
 
+import Data.List (sort,(\\) )
+
 triangles, squares, pentagonals, hexagonals, heptagonals, octagonals :: [Int]
-triangles   = map (\ n -> (n * (n+1)) `div` 2)  [0..]
-squares     = map (\ n -> n^2)              [0..]
-pentagonals = map (\ n -> n*(3*n - 1)`div`2)    [0..]
-hexagonals  = map (\ n -> n*(2*n - 1))      [0..]
-heptagonals = map (\ n -> n*(5*n - 3)`div`2)    [0..]
-octagonals  = map (\ n -> n*(3*n - 2))      [0..]
+triangles   = fourNumbers $ map (\ n -> (n * (n+1)) `div` 2)  [0..]
+squares     = fourNumbers $ map (\ n -> n^2)              [0..]
+pentagonals = fourNumbers $ map (\ n -> n*(3*n - 1)`div`2)    [0..]
+hexagonals  = fourNumbers $ map (\ n -> n*(2*n - 1))      [0..]
+heptagonals = fourNumbers $ map (\ n -> n*(5*n - 3)`div`2)    [0..]
+octagonals  = fourNumbers $ map (\ n -> n*(3*n - 2))      [0..]
+
+fourNumbers :: [Int] -> [Int]
+fourNumbers = takeWhile (<10000) . dropWhile (<1000)
 
 polynumbers=[triangles,squares,pentagonals, hexagonals, heptagonals, octagonals]
-interestingNumbers=map (filter (\x -> x<10000 && x>999)) polynumbers
+interestingNumbers=polynumbers
 
-inum = concatMap (filter (\x -> x<10000 && x>999)) polynumbers
+inum = sort $ concat polynumbers
 
 -- compatibles 1234 [3212,3412,1123] => [3412]
 -- last two digit of x are equal to first to digit of element of the list
-compatibles x = filter (\y -> (x `rem` 100) == (y `div` 100)) 
+isCompatible :: Int -> Int -> Bool
+isCompatible x y = (x `rem` 100) == (y `div` 100)
+compatibles :: Int -> [Int] -> [Int]
+compatibles x = filter (isCompatible x)
 
+sub :: Int -> Int -> [Int]
+-- sub x = compatibles x $ dropWhile (<= x) $ inum
+sub x i = compatibles x $ interestingNumbers !! i
 
 solution2 = do
-    x <- inum
-    let m = compatibles x $ dropWhile (<= x) $ inum
-    y <- m
-    let n = compatibles y $ dropWhile (<= y) $ inum
-    z <- n
-    let o = compatibles z $ dropWhile (<= z) $ inum
-    t <- o
-    let p = compatibles t $ dropWhile (<= t) $ inum
-    u <- p
-    let q = compatibles u $ dropWhile (<= u) $ inum
-    v <- q
-    let r = compatibles v [x]
-    w <- r
-    return [w,y,z,t,u,v]
-
-solution = do
-    x <- interestingNumbers !! 0
-    let m = compatibles x $ dropWhile (<= x) $ interestingNumbers !! 1
-    y <- m
-    let n = compatibles y $ dropWhile (<= y) $ interestingNumbers !! 2
-    z <- n
-    let o = compatibles z $ dropWhile (<= z) $ interestingNumbers !! 3
-    t <- o
-    let p = compatibles t $ dropWhile (<= t) $ interestingNumbers !! 4
-    u <- p
-    let q = compatibles u $ dropWhile (<= u) $ interestingNumbers !! 5
-    v <- q
-    let r = compatibles v [x]
-    w <- r
-    return [w,y,z,t,u,v]
+    i <- [0..5]
+    x <- interestingNumbers !! i
+    j <- [0..5] \\ [i]
+    y <- sub x j
+    k <- [0..5] \\ [i,j]
+    z <- sub y k
+    l <- [0..5] \\ [i,j,k]
+    t <- sub z l
+    m <- [0..5] \\ [i,j,k,l]
+    u <- sub t m
+    n <- [0..5] \\ [i,j,k,l,m]
+    v <- sub u n
+    if isCompatible v x
+        then
+            return [x,y,z,t,u,v]
+        else
+            return []
 
 main = do
-    print $ head solution2
+    print $ sort $ map sum $ filter (/=[]) solution2
