@@ -44,7 +44,7 @@ sub :: Int -> Int -> [Int]
 -- sub x = compatibles x $ dropWhile (<= x) $ inum
 sub x i = compatibles x $ interestingNumbers !! i
 
-solution2 = do
+solution = do
     i <- [0..5]
     x <- interestingNumbers !! i
     j <- [0..5] \\ [i]
@@ -59,9 +59,11 @@ solution2 = do
     v <- sub u n
     if isCompatible v x
         then
-            return [x,y,z,t,u,v]
+            return [(x,i),(y,j),(z,k),(t,l),(u,m),(v,n)]
         else
             return []
 
 main = do
-    print $ sort $ map sum $ filter (/=[]) solution2
+    let toto = head $ filter (/=[]) solution
+    print $ map (\(x,y) -> (x,y+3)) toto
+    print $ sum $ map fst toto
