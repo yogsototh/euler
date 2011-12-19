@@ -38,9 +38,12 @@ sol d = if isSquare d
            else phead $ filter (hasSolution d) [2..1000000]
 
 main = let 
-            lst = map sol [2..1000] 
+            m = 100
+            lst = map sol [2..m] 
             maxelem = foldl' (\x y -> if x>y then x else y) 0 lst
        in do
-           forM_ [2..1000] (\d -> do putStr $ (show d) ++ " -> "; print $ lst !! d)
+           forM_ [2..m] (\d -> do putStr $ (show d) ++ " -> "; print $ lst !! (d-2))
+           putStr "Maximum value: "
            print maxelem
-           print $ elemIndex maxelem lst
+           putStr "Maximum D: "
+           print $ 2 + (fromJust $ elemIndex maxelem lst)
