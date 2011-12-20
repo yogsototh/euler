@@ -1,0 +1,8 @@
+#!/usr/bin/env zsh
+
+[[ $1 != "-f" ]] && { print "Use -f option to delete:" }
+
+for fic in $(git status | tail -n +5| head -n -1 |awk '{print $2}'); do
+print '[?]' $fic
+[[ $1 = "-f" ]] && \rm $fic
+done
