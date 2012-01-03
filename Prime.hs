@@ -1,8 +1,12 @@
 module Prime
 ( primes
 , is_prime
+, primeFactors
+, relativePrime
 )
 where 
+    import Data.List
+
     data Wheel = Wheel Int [Int]
     roll (Wheel n rs) =  [n*k+r| k<-[0..], r<-rs]
     
@@ -31,3 +35,6 @@ where
                 | p*p > n           = [n]
                 | n `rem` p == 0    = p : go (n `quot` p) ps
                 | otherwise         = go n pt
+
+    relativePrime :: Int -> Int -> Bool
+    relativePrime p q = [] == intersect (primeFactors p) (primeFactors q)
