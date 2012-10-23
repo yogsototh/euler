@@ -20,8 +20,9 @@
 -- SOLUTION in English
 {-
 
-For each digit from 1 to 10:
-  put the digit in the current partially filled NGon
+Here is a backtracking solution.
++ You can change the type from list to arrays.
+  Things should be clearly faster with arrays.
 
  -}
 import Data.List
@@ -30,14 +31,16 @@ import Debug.Trace
 
 -- For testing
 -- gonSize = 3
--- magic = 9
-
 gonSize = 5
 
 data Choice = Choice [Int]
 
-safeIndex s l i = if (length l<i+1) then trace ("ERROR (" ++ s ++ "): " ++ show l ++ "(" ++ show i ++ ")") l!!i else l!!i
+-- For debugging purpose
+safeIndex s l i = if (length l<i+1)
+                  then trace ("ERROR (" ++ s ++ "): " ++ show l ++ "(" ++ show i ++ ")") l!!i
+                  else l!!i
 
+-- A better show
 instance Show Choice where
   show (Choice l)= str
     where
@@ -49,7 +52,7 @@ instance Show Choice where
           b=2*(n-1)
           lastelem=if n == gonSize then 1 else b+2
 
-
+-- Random Access Storage
 class RAS a where
   at :: a -> Int -> Int
   nbChoices :: a -> Int
@@ -64,15 +67,20 @@ instance RAS Choice where
   add (Choice l) e = Choice (l++[e])
   loop f (Choice l) = map f l
 
+-- Return true if the current choices keep to be okay
 testPartialGon :: Int -> Choice -> Bool
-testPartialGon magic c =
+testPartialGon lineSum c =
   let
     n = nbChoices c
     nbLines = if n<2*gonSize then (n-1) `div` 2 else gonSize
   in
-  all (testLine c magic) [1..nbLines]
+  all (testLine c lineSum) [1..nbLines]
 
-testLine :: Choice -> Int -> Int -> Bool
+-- test that line
+testLine :: Choice -- the current partial number choosen
+            -> Int -- the sum to verify
+            -> Int -- the line of the n-gon
+            -> Bool -- the line of the n-gon = sum
 testLine c val n =
   let
     b=max 0 2*(n-1)
@@ -81,26 +89,31 @@ testLine c val n =
   in
     (==val) . sum . map (at c) $ line
 
+-- return the results
 allTests :: [(Int,Choice)]
-allTests = concatMap (\s -> testWith s (Choice []) (Choice [n,n-1..1]) ) [6..3*((gonSize*2)-1)]
+allTests = concatMap (\s -> testWith s nothing allNumbers ) [6..3*(n-1)]
   where
+    nothing = Choice []
+    allNumbers = Choice [n,n-1..1]
     n=2*gonSize
 
-testWith :: Int -- Sum to verify
-            -> Choice   -- choosen
-            -> Choice   -- left choices
+-- Where the lineSum occurs
+testWith :: Int               -- Sum to verify
+            -> Choice         -- choosen
+            -> Choice         -- left choices
             -> [(Int,Choice)] -- successful choices
-testWith magic c lc =
-  if testPartialGon magic c
+testWith lineSum c lc =
+  if testPartialGon lineSum c
   then if nbChoices lc == 0
-       then [(magic,c)]
+       then [(lineSum,c)]
        else concat $ loop newTest lc
   else []
     where
       len = nbChoices c
+      -- newTest verify that no external number is superior to the first one.
       newTest x = if len>=3 && (len `rem` 2 == 1) && x<at c 0
                     then []
-                    else testWith magic (add c x) (remove lc x)
+                    else testWith lineSum (add c x) (remove lc x)
 
 main :: IO ()
 main = do
