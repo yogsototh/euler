@@ -29,18 +29,17 @@ import Debug.Trace
 
 
 -- For testing
-gonSize = 3
-magic = 9
+-- gonSize = 3
+-- magic = 9
 
--- gonSize = 5
--- magic = 16
+gonSize = 5
 
 data Choice = Choice [Int]
 
 safeIndex s l i = if (length l<i+1) then trace ("ERROR (" ++ s ++ "): " ++ show l ++ "(" ++ show i ++ ")") l!!i else l!!i
 
 instance Show Choice where
-  show (Choice l)= str ++ show l
+  show (Choice l)= str
     where
       n = length l
       nbLines = if n<2*gonSize then (n-1) `div` 2 else gonSize
@@ -65,8 +64,8 @@ instance RAS Choice where
   add (Choice l) e = Choice (l++[e])
   loop f (Choice l) = map f l
 
-testPartialGon :: Choice -> Bool
-testPartialGon c =
+testPartialGon :: Int -> Choice -> Bool
+testPartialGon magic c =
   let
     n = nbChoices c
     nbLines = if n<2*gonSize then (n-1) `div` 2 else gonSize
@@ -82,31 +81,28 @@ testLine c val n =
   in
     (==val) . sum . map (at c) $ line
 
-allTests :: [Choice]
-allTests = testWith (Choice []) (Choice [1..2*gonSize])
+allTests :: [(Int,Choice)]
+allTests = concatMap (\s -> testWith s (Choice []) (Choice [n,n-1..1]) ) [6..3*((gonSize*2)-1)]
+  where
+    n=2*gonSize
 
-testWith ::    Choice   -- choosen
+testWith :: Int -- Sum to verify
+            -> Choice   -- choosen
             -> Choice   -- left choices
-            -> [Choice] -- successful choices
-testWith c lc =
-  if testPartialGon c
+            -> [(Int,Choice)] -- successful choices
+testWith magic c lc =
+  if testPartialGon magic c
   then if nbChoices lc == 0
-       then [c]
+       then [(magic,c)]
        else concat $ loop newTest lc
   else []
     where
       len = nbChoices c
       newTest x = if len>=3 && (len `rem` 2 == 1) && x<at c 0
-                    then trace (show c ++ " len: " ++ show len ++ " " ++ show x ++ "<" ++ show (at c 0)) []
-                    else testWith (add c x) (remove lc x)
+                    then []
+                    else testWith magic (add c x) (remove lc x)
 
 main :: IO ()
 main = do
-  print $ Choice [4,3,2,6,1,5]
-  putStr "testPartialGon $ Choice [4,3,2,6,1,5]: "
-  print $ testPartialGon $ Choice [4,3,2,6,1,5]
-  putStr "testPartialGon $ Choice [6,2,1,3,5,4]: "
-  print $ testPartialGon $ Choice [6,2,1,3,5,4]
-  print $ Choice [6,2,1,3,5,4]
-  putStr "allTest: "
-  print $ allTests
+  putStrLn "allTest: "
+  mapM_ print $ allTests
