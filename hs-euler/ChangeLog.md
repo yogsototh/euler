@@ -1,3 +1,3 @@
-# Changelog for euler072
+# Changelog for euler
 
 ## Unreleased changes

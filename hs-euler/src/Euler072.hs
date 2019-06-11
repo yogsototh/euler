@@ -20,7 +20,7 @@ How many elements would be contained in the set of reduced proper fractions for
 d ≤ 1,000,000?
 -}
 {-# LANGUAGE NoImplicitPrelude #-}
-module Main where
+module Euler072 where
 
 import Protolude
 
@@ -37,6 +37,8 @@ reducedProper d = do
 nbFractions :: Integer -> Int
 nbFractions d = foldl' (+) 0 (map (traceShowId . length . reducedProper . traceShowId) [2..d])
 
+solutionSlow = nbFractions 1000000
+
 -- Write a list of all factors
 factors = concatMap (\(x,n) -> replicate n x) . factorise
 
@@ -52,10 +54,4 @@ phi n
       | otherwise = (a - 1) * prodPhi (b:t)
 
 -- less than 5s
-solution n = sum $ map phi [2..n]
-
-main :: IO ()
-main = do
-  let n = 1000000
-  -- print $ nbFractions n -- 303963552391
-  print $ solution n
+solution = let n = 1000000 in sum $ map phi [2..n]

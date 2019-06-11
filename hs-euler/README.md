@@ -1,1 +1,1 @@
-# euler072
+# euler

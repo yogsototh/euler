@@ -2,13 +2,13 @@
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 859091034e520db697fc23b2aeb6b27cc63dfe46541d371c8bd861b7ff922014
+-- hash: fa22c4d5b58b46bb0a1b31feef800edb37c1724fa165ed9b529637ec8b56ddc5
 
-name:           euler072
+name:           euler
 version:        0.1.0.0
-description:    Please see the README on GitHub at <https://github.com/githubuser/euler072#readme>
-homepage:       https://github.com/githubuser/euler072#readme
-bug-reports:    https://github.com/githubuser/euler072/issues
+description:    Please see the README on GitHub at <https://github.com/githubuser/euler#readme>
+homepage:       https://github.com/githubuser/euler#readme
+bug-reports:    https://github.com/githubuser/euler/issues
 author:         Author name here
 maintainer:     example@example.com
 copyright:      2019 Author name here
@@ -22,13 +22,14 @@ extra-source-files:
 
 source-repository head
   type: git
-  location: https://github.com/githubuser/euler072
+  location: https://github.com/githubuser/euler
 
 library
   exposed-modules:
+      Euler072
       Lib
   other-modules:
-      Paths_euler072
+      Paths_euler
   hs-source-dirs:
       src
   build-depends:
@@ -37,31 +38,31 @@ library
     , protolude
   default-language: Haskell2010
 
-executable euler072-exe
+executable euler
   main-is: Main.hs
   other-modules:
-      Paths_euler072
+      Paths_euler
   hs-source-dirs:
       app
   ghc-options: -O -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       arithmoi
     , base >=4.7 && <5
-    , euler072
+    , euler
     , protolude
   default-language: Haskell2010
 
-test-suite euler072-test
+test-suite euler-test
   type: exitcode-stdio-1.0
   main-is: Spec.hs
   other-modules:
-      Paths_euler072
+      Paths_euler
   hs-source-dirs:
       test
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       arithmoi
     , base >=4.7 && <5
-    , euler072
+    , euler
     , protolude
   default-language: Haskell2010
